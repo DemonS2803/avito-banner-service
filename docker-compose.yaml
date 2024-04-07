@@ -1,0 +1,55 @@
+version: "3.9"
+services:
+
+  redis:
+    image: "redis:alpine"
+    depends_on:
+      - postgres
+    ports:
+      - "6379:6379"
+#  postgres:
+#    build:
+#      dockerfile: ./DockerfilePostgres
+#    ports:
+#      - "5432:5432"
+#  postgres:
+#    image: sameersbn/postgresql:15-20230628
+#    restart: always
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        window: 15m
+#    environment:
+##      POSTGRES_DB: "mydb"
+##      POSTGRES_USER: "postgres"
+##      POSTGRES_PASSWORD: "postgres"
+#      DB_NAME: mydb
+#      DB_USER: postgres
+#      DB_PASS: postgres
+#    ports:
+#      - "5432:5432"
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: "mydb"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+#    volumes:
+#     - ./resources/database/:/docker-entrypoint-initdb.d/
+      # - ./resources/data:/var/lib/postgresql/data
+
+  app:
+    build: ./
+    depends_on:
+      postgres:
+         condition: service_healthy
+    ports:
+      - "8080:8080"

@@ -1,0 +1,18 @@
+user_banners:
+    id: int
+    title: string
+    text: string
+    url: string
+    feature_id: int
+
+features:
+    id: int
+    name: string
+
+tags:
+    id: int
+    name: string
+
+user_banners_tags:
+    banner_id: int
+    tag_id: int
