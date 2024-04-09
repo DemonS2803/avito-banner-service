@@ -1,9 +1,9 @@
 package banner
 
 import (
-	"avito-banner-service/internal/configs/postgres"
-	"avito-banner-service/internal/configs/redis"
 	"avito-banner-service/internal/models"
+	"avito-banner-service/internal/repositories/postgres"
+	"avito-banner-service/internal/repositories/redis"
 	resp "avito-banner-service/internal/utils/response"
 	"encoding/json"
 	"fmt"
@@ -55,21 +55,7 @@ func GetBanners(redisClient *redis.Redis, db *postgres.Storage) http.HandlerFunc
 				return
 			}
 		}
-
 		redis.PutBanner(*redisClient, tagId, featureId, banner)
-
-		//if banner.IsTurnedOff && r.Header.Get("token") != "admin_token" {
-		//	resp.Send403Error(w, r)
-		//	return
-		//}
-		//
-		//// MAY BE MISERRORS
-		//if err != nil {
-		//	slog.Error(fmt.Sprintf("no user-banner with id %d %d", tagId, featureId))
-		//	render.JSON(w, r, Response{Response: resp.Response{Error: resp.StatusError}})
-		//	return
-		//}
-		//slog.Log(context.Background(), 0, fmt.Sprintf("id %d in system: %s", tagId, featureId, banner.Title))
 
 		render.JSON(w, r, banner)
 	}
@@ -99,12 +85,31 @@ func GetBannersFiltered(redisClient *redis.Redis, db *postgres.Storage) http.Han
 			featureVal.Null = false
 			featureVal.Value = featureId
 		}
-		banners, err := postgres.GetBannersFilteredByFeatureOrTagId(db, tagVal, featureVal)
+
+		limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+		if err != nil {
+			limit = 10
+		}
+		offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil {
+			offset = 0
+		}
+
+		fmt.Println("limit", limit, "offset", offset)
+
+		data, err := redis.GetBannerGroup(*redisClient, tagVal, featureVal, limit, offset)
+		if err == nil {
+			render.JSON(w, r, data)
+			return
+		}
+
+		banners, err := postgres.GetBannersFilteredByFeatureOrTagId(db, tagVal, featureVal, limit, offset)
 		if err != nil {
 			slog.Error("error while getting filtered banners")
 			resp.Send500Error(w, r)
 			return
 		}
+		redis.PutBannerGroup(*redisClient, tagVal, featureVal, banners, limit, offset)
 		//w.WriteHeader(http.StatusOK)
 		render.JSON(w, r, banners)
 	}

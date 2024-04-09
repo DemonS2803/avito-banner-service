@@ -17,14 +17,14 @@ CREATE TABLE IF NOT EXISTS user_banners (
     feature_id int,
     created_at timestamp default now(),
     updated_at timestamp default now(),
-    FOREIGN KEY(feature_id) REFERENCES features(id)
+    FOREIGN KEY(feature_id) REFERENCES features(id)  On delete set null
 );
 
 CREATE TABLE IF NOT EXISTS user_banners_tags (
      banner_id INT,
      tag_id INT,
-     FOREIGN KEY(banner_id) REFERENCES user_banners(id),
-     FOREIGN KEY(tag_id) REFERENCES tags(id)
+     FOREIGN KEY(banner_id) REFERENCES user_banners(id) On delete set null ,
+     FOREIGN KEY(tag_id) REFERENCES tags(id)  On delete set null
 );
 
 

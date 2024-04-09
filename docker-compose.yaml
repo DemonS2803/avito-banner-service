@@ -7,6 +7,13 @@ services:
       - postgres
     ports:
       - "6379:6379"
+
+  redis_test:
+    image: "redis:alpine"
+    depends_on:
+      - postgres
+    ports:
+      - "6380:6379"
 #  postgres:
 #    build:
 #      dockerfile: ./DockerfilePostgres
@@ -32,13 +39,28 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: "mydb"
+      POSTGRES_DB: "avito_db"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d avito_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres_test:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: "avito_db"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d avito_db" ]
       interval: 5s
       timeout: 5s
       retries: 5

@@ -1,9 +1,9 @@
 package user_banner
 
 import (
-	"avito-banner-service/internal/configs/postgres"
-	"avito-banner-service/internal/configs/redis"
 	"avito-banner-service/internal/models"
+	"avito-banner-service/internal/repositories/postgres"
+	"avito-banner-service/internal/repositories/redis"
 	resp "avito-banner-service/internal/utils/response"
 	"github.com/go-chi/render"
 	"log/slog"
@@ -46,8 +46,11 @@ func GetBannerById(redisClient *redis.Redis, db *postgres.Storage) http.HandlerF
 			useLastRevision = false
 		}
 
-		//fmt.Println("useLastRevision ")
-		//fmt.Println(useLastRevision)
+		if redis.IsEmptyBammer(*redisClient, tagId, featureId) {
+			slog.Error("no banner info from redis")
+			resp.Send404Error(w, r)
+			return
+		}
 
 		var banner models.UserBanner
 		isCached := redis.GetBannerById(*redisClient, tagId, featureId, &banner)
@@ -55,6 +58,7 @@ func GetBannerById(redisClient *redis.Redis, db *postgres.Storage) http.HandlerF
 			banner, err = postgres.GetUserBannerByTagIdAndFeatureId(db, tagId, featureId)
 			if err != nil {
 				slog.Error("error while get banner from db: ", err)
+				redis.PutEmptyBanner(*redisClient, tagId, featureId)
 				resp.Send404Error(w, r)
 				return
 			}
@@ -75,5 +79,11 @@ func GetBannerById(redisClient *redis.Redis, db *postgres.Storage) http.HandlerF
 		//fmt.Println(string(res))
 		//fmt.Println("next id ", postgres.GetNextUserBannerId(db))
 		render.JSON(w, r, banner.Content)
+	}
+}
+
+func Ping() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		resp.Send200Success(w, r)
 	}
 }
