@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	host     = "localhost"
+	host     = "postgres"
 	port     = 5432
 	user     = "postgres"
 	password = "postgres"
@@ -73,7 +73,7 @@ func CheckError(err error) {
 }
 
 func readInitFile() string {
-	file, err := os.Open("../resources/database/init.sql")
+	file, err := os.Open("resources/database/init.sql")
 	slog.Info("in read init", err)
 	CheckError(err)
 	b, err := io.ReadAll(file)
@@ -83,7 +83,7 @@ func readInitFile() string {
 }
 
 func readFillFile() string {
-	file, err := os.Open("../resources/database/fill.sql")
+	file, err := os.Open("resources/database/fill.sql")
 	CheckError(err)
 	b, err := io.ReadAll(file)
 	CheckError(err)

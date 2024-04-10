@@ -1,8 +1,8 @@
-FROM golang:1.22
+FROM golang:alpine
 
 WORKDIR /app
 ADD go.mod .
 COPY . .
-RUN go build -o main cmd/main.go
+RUN go build -o main main.go
 
 ENTRYPOINT ["./main"]

@@ -20,7 +20,7 @@ import { env } from './config.js';
 //     },
 // };
 export const options = {
-    vus: 20,
+    vus: 10,
     duration: '20s',
     gracefulStop: '3s',
 };

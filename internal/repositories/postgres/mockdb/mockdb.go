@@ -70,7 +70,7 @@ func CheckError(err error) {
 }
 
 func readInitFile() string {
-	file, err := os.Open("../resources/database/init.sql")
+	file, err := os.Open("resources/database/init.sql")
 	CheckError(err)
 	b, err := io.ReadAll(file)
 	CheckError(err)
@@ -79,7 +79,7 @@ func readInitFile() string {
 }
 
 func readFillFile() string {
-	file, err := os.Open("../resources/database/fill.sql")
+	file, err := os.Open("resources/database/fill.sql")
 	CheckError(err)
 	b, err := io.ReadAll(file)
 	CheckError(err)
