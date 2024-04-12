@@ -218,7 +218,7 @@ func GetNextUserBannerId(storage *Storage) int {
 	err := storage.Db.QueryRow(`select MAX(id) FROM user_banners;`).Scan(&maxId)
 	if err != nil {
 		slog.Error("error while saving new banner ", err)
-		return -1
+		return 1
 	}
 	return maxId + 1
 }

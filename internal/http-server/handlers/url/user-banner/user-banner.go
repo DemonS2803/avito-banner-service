@@ -71,13 +71,6 @@ func GetBannerById(redisClient *redis.Redis, db *postgres.Storage) http.HandlerF
 			return
 		}
 
-		//slog.Log(context.Background(), 0, fmt.Sprintf("id %d in system: %s", tagId, featureId, banner.Content))
-
-		//w.Header().Set("Content-Type", "application/json")
-
-		//res, err := json.Marshal(banner.Content)
-		//fmt.Println(string(res))
-		//fmt.Println("next id ", postgres.GetNextUserBannerId(db))
 		render.JSON(w, r, banner.Content)
 	}
 }
